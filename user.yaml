@@ -1,0 +1,5 @@
+- name: Configure User server
+  hosts: user
+  become: yes
+  roles:
+  - user

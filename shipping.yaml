@@ -1,0 +1,5 @@
+- name: Configure Shipping server
+  hosts: shipping
+  become: yes
+  roles:
+  - shipping

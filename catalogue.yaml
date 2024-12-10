@@ -1,0 +1,5 @@
+- name: Configure Catalogue server
+  hosts: catalogue
+  become: yes
+  roles:
+  - catalogue
