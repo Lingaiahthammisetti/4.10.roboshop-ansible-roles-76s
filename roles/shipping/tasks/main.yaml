@@ -52,52 +52,28 @@
       name: mysql
       state: present
 
-  - name: load cities data
-    ansible.builtin.shell: "mysql -h mysql.lingaiah.online -uroot -p{{mysql_password}}  < /app/db/schema.sql"
+  - name: check cities schema exists or not
+    ansible.builtin.command:  mysql -h mysql.lingaiah.online -uroot -p{{mysql_password}} -sN -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'cities'"
+    register: schema
 
-  - name: load cities data-2
-    ansible.builtin.shell: "mysql -h mysql.lingaiah.online -uroot -p{{mysql_password}}  < /app/db/app-user.sql"
-  
-  - name: load cities data-3
-    ansible.builtin.shell: "mysql -h mysql.lingaiah.online -uroot -p{{mysql_password}}  < /app/db/master-data.sql"
+  - name: print output
+    ansible.builtin.debug:
+      msg: "schema output: {{schema}}"
+
+  - name: load cities data
+    ansible.builtin.shell: "mysql -h mysql.lingaiah.online -uroot -pRoboShop@1 < /app/db/schema.sql"
+    when: schema.stdout != "1"
+
+  - name: load cities data
+    ansible.builtin.shell: "mysql -h mysql.lingaiah.online -uroot -pRoboShop@1 < /app/db/app-user.sql"
+    when: schema.stdout != "1"
+
+  - name: load cities data
+    ansible.builtin.shell: "mysql -h mysql.lingaiah.online -uroot -pRoboShop@1 < /app/db/master-data.sql"
+    when: schema.stdout != "1"
 
   - name: start and enable shipping
     ansible.builtin.service:
       name: shipping
       state: restarted
       enabled: yes
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-============================
-- name: app setup
-  ansible.builtin.import_role:
-    name: common
-    tasks_from: app-setup
-
-- name: java
-  ansible.builtin.import_role:
-    name: common
-    tasks_from: java
-
-- name: mysql setup
-  ansible.builtin.import_role:
-    name: common
-    tasks_from: mysql-setup
-
-- name: system start
-  ansible.builtin.import_role:
-    name: common
-    tasks_from: systemd
