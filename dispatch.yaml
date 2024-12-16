@@ -1,0 +1,5 @@
+- name: Configure Dispatch server
+  hosts: dispatch
+  become: yes
+  roles:
+  - dispatch
